@@ -1,0 +1,26 @@
+.vjs-admarker {
+    position: absolute;
+    left: 0;
+    top: 1.3em;
+    opacity: 1;
+    height: 4px;
+    width: 7px;
+    background-color: red;
+    transition: opacity .2s ease;
+    -webkit-transition: opacity .2s ease;
+    -moz-transition: opacity .2s ease;
+}
+
+
+.vjs-admarker-announcer {
+    position: absolute;
+    left: 0;
+    top: 1.3em;
+    opacity: 1;
+    height: 4px;
+    width: 7px;
+    background-color: yellow;
+    transition: opacity .2s ease;
+    -webkit-transition: opacity .2s ease;
+    -moz-transition: opacity .2s ease;
+}
