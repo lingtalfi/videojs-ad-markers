@@ -151,6 +151,8 @@ In order to successfully implement this example, you need to have some mp4 files
 
  
  
+Note: in the above example I use a default video for the ad video container, so that there is no js error.   
+ 
  
  
  
