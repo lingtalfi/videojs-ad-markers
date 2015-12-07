@@ -4,7 +4,6 @@
 (function ($, videojs, undefined) {
     //default setting
     var defaultSetting = {
-        announceTime: 15,
         stylizeMarker: function (jMarkerDiv, position) {
             jMarkerDiv.css({
                 "left": position + '%'
@@ -13,9 +12,20 @@
         getMarkerTime: function (marker) {
             return marker.time;
         },
-        onMarkerClick: function (marker) {
+        /**
+         * Personal note:
+         * This allows us to load the next ad, set it on pause, and we will play it when the next marker
+         * will trigger the playAd callback.
+         * I noticed that some youtube videos (at least on the youtube.com website), if paused for too long,
+         * won't resume when we push the play button.
+         * We can deal with this problem within this callback because we have the nextMarker info,
+         * so we can set a timeout if the nextMarker is too far away from the current time.
+         * The current time is accessible via player.currentTime() if needed.
+         *
+         */
+        prepareNextAd: function (nextMarker) {
         },
-        onMarkerReached: function (marker) {
+        playAd: function (marker) {
         },
         markers: []
     };
@@ -31,18 +41,21 @@
         return uuid;
     };
 
+
     function registerVideoJsMarkersPlugin(options) {
         /**
          * register the adMarkers plugin (dependent on jquery)
          */
 
-        var setting = $.extend(true, {}, defaultSetting, options),
-            markersMap = {},
-            markersList = [], // list of adMarkers sorted by time
-            videoWrapper = $(this.el()),
-            currentMarkerIndex = -1,
-            player = this,
-            overlayIndex = -1;
+        var setting = $.extend(true, {}, defaultSetting, options);
+        var markersMap = {};
+        var markersList = []; // list of adMarkers sorted by time
+        var videoWrapper = $(this.el());
+        var nextMarker = null;
+        var prepareMode = true;
+        var player = this;
+        var isInitialized = false;
+
 
         function sortMarkersList() {
             // sort the list by time in asc order
@@ -52,13 +65,10 @@
         }
 
         function addMarkers(newMarkers) {
+
             // create the adMarkers
             $.each(newMarkers, function (index, marker) {
                 marker.key = generateUUID();
-                if ('undefined' === typeof marker.loader) {
-                    marker.loader = false;
-                }
-
                 videoWrapper.find('.vjs-progress-control').append(createMarkerDiv(marker));
 
                 // store marker in an internal hash map
@@ -67,6 +77,15 @@
             });
 
             sortMarkersList();
+        }
+
+        function getNextMarker(time) {
+            for (var i in markersList) {
+                if (markersList[i].time >= time) {
+                    return markersList[i];
+                }
+            }
+            return false;
         }
 
         function getPosition(marker) {
@@ -97,7 +116,6 @@
 
 
         function removeMarkers(indexArray) {
-            currentMarkerIndex = -1;
 
             for (var i = 0; i < indexArray.length; i++) {
                 var index = indexArray[i];
@@ -125,68 +143,54 @@
 
 
         function onTimeUpdate() {
-            /*
-             check marker reached in between adMarkers
-             the logic here is that it triggers a new marker reached event only if the player 
-             enters a new marker range (e.g. from marker 1 to marker 2). Thus, if player is on marker 1 and user
-             clicked on marker 1 again, no new reached event is triggered)
-             */
+            if (false === player.adMarkers.adPlaying) {
+                if (false !== nextMarker) {
 
-            var getNextMarkerTime = function (index) {
-                if (index < markersList.length - 1) {
-                    return setting.getMarkerTime(markersList[index + 1]);
-                }
-                // next marker time of last marker would be end of video time
-                return player.duration();
-            }
-            var currentTime = player.currentTime();
-            var newMarkerIndex;
-
-
-            if (currentMarkerIndex != -1) {
-                // check if staying at same marker
-                var nextMarkerTime = getNextMarkerTime(currentMarkerIndex);
-                if (currentTime >= setting.getMarkerTime(markersList[currentMarkerIndex]) && currentTime < nextMarkerTime) {
-                    return;
-                }
-            }
-
-            // check first marker, no marker is selected
-            if (markersList.length > 0 &&
-                currentTime < setting.getMarkerTime(markersList[0])) {
-                newMarkerIndex = -1;
-            } else {
-                // look for new index
-                for (var i = 0; i < markersList.length; i++) {
-                    nextMarkerTime = getNextMarkerTime(i);
-                    if (currentTime >= setting.getMarkerTime(markersList[i]) &&
-                        currentTime < nextMarkerTime) {
-                        newMarkerIndex = i;
-                        break;
+                    if (true === prepareMode) {
+                        prepareNextAd(nextMarker);
+                    }
+                    else {
+                        var currentTime = player.currentTime();
+                        /**
+                         * I noticed that 0 is a special value that occurs even when I used
+                         * the player.currentTime(120) function.
+                         * So I prefer to skip it.
+                         *
+                         */
+                        if (0 !== currentTime) {
+                            if (nextMarker.time <= currentTime) {
+                                options.playAd(nextMarker);
+                                player.adMarkers.adPlaying = true;
+                                nextMarker = getNextMarker(currentTime);
+                                prepareMode = true;
+                            }
+                        }
                     }
                 }
             }
-
-            // set new marker index
-            if (newMarkerIndex != currentMarkerIndex) {
-                // trigger event
-                if (newMarkerIndex != -1 && options.onMarkerReached) {
-                    options.onMarkerReached(markersList[newMarkerIndex]);
-                }
-                currentMarkerIndex = newMarkerIndex;
-            }
-
         }
+
+        function prepareNextAd(nextMarker) {
+            setting.prepareNextAd(nextMarker);
+            prepareMode = false;
+        }
+
 
         // setup the whole thing
         function initialize() {
+            if (false === isInitialized) {
 
-            // remove existing adMarkers if already initialized
-            player.adMarkers.removeAll();
-            addMarkers(options.markers);
+                isInitialized = true;
+                // remove existing adMarkers if already initialized
+                player.adMarkers.removeAll();
+                addMarkers(options.markers);
 
-            onTimeUpdate();
-            player.on("timeupdate", onTimeUpdate);
+                nextMarker = getNextMarker(0);
+                if (false !== nextMarker) {
+                    prepareNextAd(nextMarker);
+                }
+                player.on("timeupdate", onTimeUpdate);
+            }
         }
 
         // setup the plugin after we loaded video's meta data
@@ -196,6 +200,7 @@
 
         // exposed plugin API
         player.adMarkers = {
+            adPlaying: false,
             getMarkers: function () {
                 return markersList;
             },
