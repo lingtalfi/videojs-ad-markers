@@ -141,6 +141,13 @@
             sortMarkersList();
         }
 
+        function hideMarkers() {
+            videoWrapper.find(".vjs-admarker").hide();
+        }
+
+        function showMarkers() {
+            videoWrapper.find(".vjs-admarker").show();
+        }
 
         function onTimeUpdate() {
             if (false === player.adMarkers.adPlaying) {
@@ -218,6 +225,12 @@
                     indexArray.push(i);
                 }
                 removeMarkers(indexArray);
+            },
+            hide: function() {
+                hideMarkers();
+            },
+            show: function() {
+                showMarkers();
             },
             reset: function (newMarkers) {
                 // remove all the existing adMarkers and add new ones
