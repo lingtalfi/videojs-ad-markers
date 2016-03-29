@@ -97,7 +97,7 @@
             if (false !== marker.loader) {
                 markerDiv = document.createElement('div');
                 markerDiv.className += 'vjs-admarker';
-                markerDiv.className += 'vjs-admarker-announcer';
+                markerDiv.className += ' vjs-admarker-announcer';
             }
             else {
                 markerDiv = document.createElement('div');
