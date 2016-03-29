@@ -107,8 +107,8 @@
             // stylize (and position) the marker
             setting.stylizeMarker(markerDiv, getPosition(marker));
 
-            markerDiv.dataset.marker-key = marker.key;
-            markerDiv.dataset.marker-time = setting.getMarkerTime(marker);
+            markerDiv.dataset.markerKey = marker.key;
+            markerDiv.dataset.markerTime = setting.getMarkerTime(marker);
 
             return markerDiv;
         }
