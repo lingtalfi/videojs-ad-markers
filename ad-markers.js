@@ -65,7 +65,7 @@
         function addMarkers(newMarkers) {
 
             // create the adMarkers
-            newMarkers.forEach(function (index, marker) {
+            newMarkers.forEach(function (marker, index) {
                 marker.key = generateUUID();
                 videoWrapper.$('.vjs-progress-control').appendContent(createMarkerDiv(marker));
 
