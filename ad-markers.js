@@ -125,7 +125,7 @@
                     markersList[index] = null;
 
                     // delete from dom
-                    videoWrapper.$(".vjs-admarker[data-marker-key='" + marker.key + "']")).remove();
+                    videoWrapper.$(".vjs-admarker[data-marker-key='" + marker.key + "']").remove();
                 }
             }
 
