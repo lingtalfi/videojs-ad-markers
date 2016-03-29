@@ -48,7 +48,7 @@
         var setting = videojs.mergeOptions(defaultSetting, options);
         var markersMap = {};
         var markersList = []; // list of adMarkers sorted by time
-        var videoWrapper = this.el();
+        var videoWrapper = this;
         var nextMarker = null;
         var prepareMode = true;
         var player = this;
