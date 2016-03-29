@@ -95,16 +95,17 @@
             var parser=new DOMParser();
 
             if (false !== marker.loader) {
-                markerDiv = parser.parseFromString("<div class='vjs-admarker vjs-admarker-announcer'></div>", 'text/html');
+                markerDiv = document.createElement('div');
+                markerDiv.className += 'vjs-admarker';
+                markerDiv.className += 'vjs-admarker-announcer';
             }
             else {
-                markerDiv = parser.parseFromString("<div class='vjs-admarker'></div>", 'text/html');
+                markerDiv = document.createElement('div');
+                markerDiv.className += 'vjs-admarker';
             }
-
 
             // stylize (and position) the marker
             setting.stylizeMarker(markerDiv, getPosition(marker));
-
 
             markerDiv.dataset.marker-key = marker.key;
             markerDiv.dataset.marker-time = setting.getMarkerTime(marker);
