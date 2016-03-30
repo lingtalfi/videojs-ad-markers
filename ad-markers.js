@@ -1,13 +1,11 @@
 /*! ad-markers */
 'use strict';
 
-(function ($, videojs, undefined) {
+(function (videojs, undefined) {
     //default setting
     var defaultSetting = {
         stylizeMarker: function (jMarkerDiv, position) {
-            jMarkerDiv.css({
-                "left": position + '%'
-            });
+            jMarkerDiv.style.left =  position + '%'
         },
         getMarkerTime: function (marker) {
             return marker.time;
@@ -47,10 +45,10 @@
          * register the adMarkers plugin (dependent on jquery)
          */
 
-        var setting = $.extend(true, {}, defaultSetting, options);
+        var setting = videojs.mergeOptions(defaultSetting, options);
         var markersMap = {};
         var markersList = []; // list of adMarkers sorted by time
-        var videoWrapper = $(this.el());
+        var videoWrapper = this;
         var nextMarker = null;
         var prepareMode = true;
         var player = this;
@@ -67,9 +65,9 @@
         function addMarkers(newMarkers) {
 
             // create the adMarkers
-            $.each(newMarkers, function (index, marker) {
+            newMarkers.forEach(function (marker, index) {
                 marker.key = generateUUID();
-                videoWrapper.find('.vjs-progress-control').append(createMarkerDiv(marker));
+                videoWrapper.$('.vjs-progress-control').appendChild(createMarkerDiv(marker));
 
                 // store marker in an internal hash map
                 markersMap[marker.key] = marker;
@@ -94,22 +92,19 @@
 
         function createMarkerDiv(marker) {
             var markerDiv;
+            var parser=new DOMParser();
 
+            markerDiv = document.createElement('div');
+            markerDiv.className += 'vjs-admarker';
             if (false !== marker.loader) {
-                markerDiv = $("<div class='vjs-admarker vjs-admarker-announcer'></div>");
+                markerDiv.className += ' vjs-admarker-announcer';
             }
-            else {
-                markerDiv = $("<div class='vjs-admarker'></div>");
-            }
-
 
             // stylize (and position) the marker
             setting.stylizeMarker(markerDiv, getPosition(marker));
 
-
-            markerDiv
-                .attr("data-marker-key", marker.key)
-                .attr("data-marker-time", setting.getMarkerTime(marker));
+            markerDiv.dataset.markerKey = marker.key;
+            markerDiv.dataset.markerTime = setting.getMarkerTime(marker);
 
             return markerDiv;
         }
@@ -126,7 +121,7 @@
                     markersList[index] = null;
 
                     // delete from dom
-                    videoWrapper.find(".vjs-admarker[data-marker-key='" + marker.key + "']").remove();
+                    videoWrapper.$(".vjs-admarker[data-marker-key='" + marker.key + "']").remove();
                 }
             }
 
@@ -247,4 +242,4 @@
 
     videojs.plugin('adMarkers', registerVideoJsMarkersPlugin);
 
-})(jQuery, window.videojs);
+})(window.videojs);
