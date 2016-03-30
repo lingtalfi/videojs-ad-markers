@@ -94,14 +94,10 @@
             var markerDiv;
             var parser=new DOMParser();
 
+            markerDiv = document.createElement('div');
+            markerDiv.className += 'vjs-admarker';
             if (false !== marker.loader) {
-                markerDiv = document.createElement('div');
-                markerDiv.className += 'vjs-admarker';
                 markerDiv.className += ' vjs-admarker-announcer';
-            }
-            else {
-                markerDiv = document.createElement('div');
-                markerDiv.className += 'vjs-admarker';
             }
 
             // stylize (and position) the marker
