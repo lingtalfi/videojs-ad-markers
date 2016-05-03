@@ -67,7 +67,8 @@
             // create the adMarkers
             newMarkers.forEach(function (marker, index) {
                 marker.key = generateUUID();
-                videoWrapper.$('.vjs-progress-control').appendChild(createMarkerDiv(marker));
+                var thisMarker = videoWrapper.$('.vjs-progress-control')
+                thisMarker.appendChild(createMarkerDiv(marker));
 
                 // store marker in an internal hash map
                 markersMap[marker.key] = marker;
@@ -137,11 +138,15 @@
         }
 
         function hideMarkers() {
-            videoWrapper.find(".vjs-admarker").hide();
+            for (var key in markersMap) {
+                videoWrapper.$(".vjs-admarker[data-marker-key='" + key + "']").style.display = 'none';
+            };
         }
 
         function showMarkers() {
-            videoWrapper.find(".vjs-admarker").show();
+            for (var key in markersMap) {
+                videoWrapper.$(".vjs-admarker[data-marker-key='" + key + "']").style.display = '';
+            };
         }
 
         function onTimeUpdate() {
