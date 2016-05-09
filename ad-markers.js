@@ -137,11 +137,15 @@
         }
 
         function hideMarkers() {
-            videoWrapper.find(".vjs-admarker").hide();
+            for (var key in markersMap) {
+                videoWrapper.$(".vjs-admarker[data-marker-key='" + key + "']").style.display = 'none';
+            };
         }
 
         function showMarkers() {
-            videoWrapper.find(".vjs-admarker").show();
+            for (var key in markersMap) {
+                videoWrapper.$(".vjs-admarker[data-marker-key='" + key + "']").style.display = '';
+            };
         }
 
         function onTimeUpdate() {
