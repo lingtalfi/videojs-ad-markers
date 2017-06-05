@@ -1,0 +1,12 @@
+{
+  "name": "videojs-ad-markers",
+  "version": "1.0.2",
+  "description": "Video Player ad markers",
+  "repository": "https://github.com/DramaFever/videojs-ad-markers",
+  "license": "LicenseRef-DramaFever-Corp",
+  "author": "Jin Park",
+  "contributors": [
+    "Jin Park <jin@dramafever.com>",
+    "David Herzog <dherzog@dramafever.com>"
+  ]
+}
